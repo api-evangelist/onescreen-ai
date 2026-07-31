@@ -1,7 +1,28 @@
 aid: onescreen-ai
+accessModel:
+  pricing: unknown
+  onboarding: unknown
+  trial: false
+  try_now: false
+  public: false
+  label: Unknown
+  confidence: low
+  source: []
+  generated: '2026-07-22'
+  method: derived
+image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/onescreen-ai.png
 name: OneScreen AI
-description: OneScreen AI is a company surfaced as a portfolio company of techstars and added to the API
-  Evangelist network as a stub for enrichment. This profile is a lead awaiting the enrichment pipeline.
+description: >-
+  OneScreen AI is a data-driven out-of-home (OOH) advertising company that makes
+  real-world media — billboards, transit, and place-based advertising — as
+  queryable and buyable as any digital channel. It combines more than 1,500 OOH
+  audience personas, close to one million live inventory listings, and
+  audience-based market and inventory recommendation models. OneScreen exposes
+  this OOH intelligence to AI agents through a public Model Context Protocol
+  (MCP) server (OAuth 2.1, free public beta) that connects to Claude, ChatGPT,
+  or any MCP-compatible client. Products include OneScreen Research (free) and
+  OneScreen Planner (closed beta). The company was originally surfaced as a
+  Techstars portfolio lead and is headquartered in Boston, Massachusetts.
 url: https://raw.githubusercontent.com/api-evangelist/onescreen-ai/refs/heads/main/apis.yml
 x-type: company
 x-source: vc-portfolio
@@ -11,9 +32,17 @@ x-tier: stub
 x-tier-reason: portfolio-lead
 specificationVersion: '0.20'
 created: '2026-07-17'
-modified: '2026-07-17'
+modified: '2026-07-20'
 tags:
 - Company
+- Advertising
+- Out-of-Home
+- DOOH
+- Advertising Technology
+- Marketing
+- Media
+- AI Agents
+- MCP
 apis: []
 maintainers:
 - FN: Kin Lane
@@ -23,3 +52,27 @@ maintainers:
 common:
 - type: Website
   url: https://onescreen.ai/
+- type: MCPServer
+  name: OneScreen MCP Server
+  url: mcp/onescreen-ai-mcp.yml
+- type: Documentation
+  name: OneScreen MCP Server documentation
+  url: https://www.onescreen.ai/mcp/
+- type: DomainSecurity
+  url: security/onescreen-ai-domain-security.yml
+- type: LLMsTxt
+  url: llms/onescreen-ai-llms.txt
+- type: Blog
+  url: https://www.onescreen.ai/blog/
+- type: Support
+  name: Contact
+  url: https://www.onescreen.ai/contact/
+- type: TermsOfService
+  url: https://www.onescreen.ai/terms-of-service/
+- type: PrivacyPolicy
+  url: https://www.onescreen.ai/privacy-policy/
+x-enrichment:
+  date: '2026-07-20'
+  status: enriched
+  artifacts_added: 3
+  pass: local-v1

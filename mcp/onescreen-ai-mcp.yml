@@ -1,0 +1,50 @@
+generated: '2026-07-20'
+method: searched
+source: https://www.onescreen.ai/mcp/
+status: published            # public beta, access-by-request
+server:
+  name: OneScreen MCP Server
+  summary: >-
+    Connects OneScreen's out-of-home (OOH) advertising research data — audience
+    personas, market and inventory rankings, and close to one million live
+    inventory listings — to AI clients such as Claude and ChatGPT, or any client
+    that supports the Model Context Protocol.
+  transport: http           # remote/hosted MCP server (HTTP)
+  url: null                 # endpoint provisioned per tenant after beta approval; not publicly published
+  access_url: https://www.onescreen.ai/mcp/
+  access: request-access    # approved in batches during public beta; most signups same business day
+  pricing: free             # public MCP research tools are free (OneScreen Research tier)
+auth:
+  scheme: oauth2            # OAuth 2.1
+  notes: >-
+    OAuth 2.1 with audience-restricted tokens, per-tenant isolation, and audit
+    logs on every call. Per the provider, OneScreen cannot access the user's
+    data, chat conversations, or files.
+clients:
+  - Claude
+  - ChatGPT
+  - any MCP-compatible client or harness
+# Capability families the server exposes, per the provider's public MCP page and
+# press coverage. These are described capabilities, NOT verbatim tool/operationId
+# names (the tool manifest and endpoint are gated behind beta access), so no exact
+# tool schema is asserted here.
+capabilities:
+  - name: audience-personas
+    description: Query 1,500+ OOH audience personas.
+  - name: market-rankings
+    description: Audience-based market ranking and recommendations.
+  - name: inventory-rankings
+    description: Audience-based inventory ranking and recommendations.
+  - name: inventory-search
+    description: Search close to one million live OOH inventory listings (e.g. billboard inventory for a demographic in a given city).
+tiers:
+  - name: OneScreen Research
+    access: public beta (free)
+    scope: audience personas, inventory listings, market/inventory recommendations
+  - name: OneScreen Planner
+    access: closed beta (invitation-only design partners)
+    scope: higher rate limits; permission-based pricing intelligence; planning/buying workflow integration
+sources:
+  - https://www.onescreen.ai/mcp/
+  - https://martechseries.com/sales-marketing/programmatic-buying/onescreen-modernizes-out-of-home-advertising-previews-real-world-ooh-intelligence-inside-enterprise-ai-workflows/
+  - https://billboardinsider.com/onescreen-embeds-one-million-live-listings-into-chatgpt-and-claude/
