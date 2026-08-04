@@ -1,7 +1,8 @@
 generated: '2026-07-20'
 method: searched
 source: https://www.onescreen.ai/mcp/
-status: published            # public beta, access-by-request
+status: published
+status_raw: published
 server:
   name: OneScreen MCP Server
   summary: >-
