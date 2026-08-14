@@ -1,15 +1,17 @@
 aid: onescreen-ai
 accessModel:
-  pricing: unknown
-  onboarding: unknown
+  pricing: free
+  onboarding: request-access
   trial: false
   try_now: false
-  public: false
-  label: Unknown
-  confidence: low
-  source: []
-  generated: '2026-07-22'
-  method: derived
+  public: true
+  label: Free public beta, access by request
+  confidence: high
+  source:
+  - https://www.onescreen.ai/mcp/
+  - https://mcp.onescreen.ai/.well-known/oauth-protected-resource/mcp
+  generated: '2026-08-13'
+  method: searched
 image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/onescreen-ai.png
 name: OneScreen AI
 description: >-
@@ -19,10 +21,12 @@ description: >-
   audience personas, close to one million live inventory listings, and
   audience-based market and inventory recommendation models. OneScreen exposes
   this OOH intelligence to AI agents through a public Model Context Protocol
-  (MCP) server (OAuth 2.1, free public beta) that connects to Claude, ChatGPT,
-  or any MCP-compatible client. Products include OneScreen Research (free) and
-  OneScreen Planner (closed beta). The company was originally surfaced as a
-  Techstars portfolio lead and is headquartered in Boston, Massachusetts.
+  (MCP) server at https://mcp.onescreen.ai/mcp, protected by OAuth 2.1 with
+  audience-restricted tokens, open dynamic client registration and a published
+  22-scope permission model — and no REST or GraphQL contract at all. Products
+  include OneScreen Research (free public beta) and OneScreen Planner (closed
+  beta). The company was originally surfaced as a Techstars portfolio lead and
+  is headquartered in Boston, Massachusetts.
 url: https://raw.githubusercontent.com/api-evangelist/onescreen-ai/refs/heads/main/apis.yml
 x-type: company
 x-source: vc-portfolio
@@ -32,7 +36,7 @@ x-tier: stub
 x-tier-reason: portfolio-lead
 specificationVersion: '0.20'
 created: '2026-07-17'
-modified: '2026-07-20'
+modified: '2026-08-13'
 tags:
 - Company
 - Advertising
@@ -43,12 +47,30 @@ tags:
 - Media
 - AI Agents
 - MCP
-apis: []
-maintainers:
-- FN: Kin Lane
-  email: kin@apievangelist.com
-- FN: APIs.json
-  email: info@apis.io
+- OAuth
+- Agent Readiness
+apis:
+- name: OneScreen MCP Server
+  description: >-
+    OneScreen's only API surface: a remote Model Context Protocol server over Streamable
+    HTTP that exposes OOH audience personas, market and inventory rankings, geospatial
+    points of interest, media-owner records and the plan/RFP/messaging marketplace workflow
+    to any MCP-capable AI client. POST-only (GET returns 405); every call requires an
+    OAuth 2.1 bearer token and the 401 advertises RFC 9728 protected-resource metadata, so
+    a client can discover and register itself with no out-of-band configuration. The tool
+    manifest (15 tools per the provider) is auth-gated.
+  humanURL: https://www.onescreen.ai/mcp/
+  baseURL: https://mcp.onescreen.ai/mcp
+  tags:
+  - MCP
+  - Out-of-Home
+  - Advertising
+  - Audience Data
+  - Inventory
+  - OAuth
+  properties:
+  - type: MCPServer
+    url: mcp/onescreen-ai-mcp.yml
 common:
 - type: Website
   url: https://onescreen.ai/
@@ -58,6 +80,30 @@ common:
 - type: Documentation
   name: OneScreen MCP Server documentation
   url: https://www.onescreen.ai/mcp/
+- type: Authentication
+  name: OAuth 2.1 authentication profile
+  url: authentication/onescreen-ai-authentication.yml
+- type: OAuthScopes
+  name: Published MCP OAuth scopes
+  url: scopes/onescreen-ai-scopes.yml
+- type: WellKnown
+  name: /.well-known discovery index
+  url: well-known/onescreen-ai-well-known.yml
+- type: ContentSignal
+  name: Cloudflare Content Signals policy (robots.txt)
+  url: https://www.onescreen.ai/robots.txt
+- type: Conformance
+  url: conformance/onescreen-ai-conformance.yml
+- type: Conventions
+  url: conventions/onescreen-ai-conventions.yml
+- type: Plans
+  url: plans/onescreen-ai-plans-pricing.yml
+- type: RateLimits
+  url: rate-limits/onescreen-ai-rate-limits.yml
+- type: Lifecycle
+  url: lifecycle/onescreen-ai-lifecycle.yml
+- type: Packages
+  url: packages/onescreen-ai-packages.yml
 - type: DomainSecurity
   url: security/onescreen-ai-domain-security.yml
 - type: LLMsTxt
@@ -67,12 +113,20 @@ common:
 - type: Support
   name: Contact
   url: https://www.onescreen.ai/contact/
+- type: Login
+  name: OneScreen login
+  url: https://auth.onescreen.ai/
 - type: TermsOfService
   url: https://www.onescreen.ai/terms-of-service/
 - type: PrivacyPolicy
   url: https://www.onescreen.ai/privacy-policy/
+maintainers:
+- FN: Kin Lane
+  email: kin@apievangelist.com
+- FN: APIs.json
+  email: info@apis.io
 x-enrichment:
-  date: '2026-07-20'
+  date: '2026-08-13'
   status: enriched
-  artifacts_added: 3
+  artifacts_added: 12
   pass: local-v1
