@@ -1,0 +1,31 @@
+generated: '2026-08-13'
+method: searched
+source: https://www.onescreen.ai/mcp/
+note: >-
+  OneScreen documents no numeric rate limits and no rate-limit response headers anywhere on
+  its public surface. The only published statement is comparative: the Planner closed beta is
+  described as offering "higher rate limits" than the free Research tier, with no figure on
+  either side. Headers could not be observed either — every request to
+  https://mcp.onescreen.ai/mcp is rejected with 401 before any limit is applied, and the
+  401 response carries no RateLimit-*, X-RateLimit-* or Retry-After header.
+limit_count: 0
+headers_published: false
+headers_observed: []
+exhaustion_status_code: null
+retry_after: null
+qualitative:
+- tier: OneScreen Research
+  statement: free public beta; limits not published
+- tier: OneScreen Planner
+  statement: '"higher rate limits" than Research; no figure published'
+probes:
+- url: https://mcp.onescreen.ai/mcp
+  method: POST
+  http_status: 401
+  rate_limit_headers: none
+- url: https://api.onescreen.ai/health
+  method: GET
+  http_status: 200
+  rate_limit_headers: none
+sources:
+- https://www.onescreen.ai/mcp/

@@ -1,0 +1,48 @@
+generated: '2026-08-13'
+method: searched
+source: registry searches (npm, PyPI, RubyGems, crates.io, NuGet, Maven Central, pkg.go.dev) + GitHub org
+note: >-
+  An honest zero. OneScreen ships no first-party client library, SDK or CLI on any public
+  package registry, and its GitHub organization has no public repositories. This is
+  consistent with its distribution model: the product is a remote MCP endpoint an agent
+  connects to over OAuth, so there is nothing for a developer to install. No `SDKs` pointer is
+  emitted in apis.yml — there is no SDK to point at.
+package_count: 0
+official_package_count: 0
+packages: []
+searched:
+- registry: npm
+  queries:
+  - onescreen
+  - onescreen-ai
+  - onescreen-mcp
+  - '@onescreen/mcp'
+  - '@onescreenai/mcp'
+  result: 404 on every exact name
+  search_api: >-
+    registry.npmjs.org/-/v1/search?text=onescreen returned one unrelated third-party package,
+    @blotoutio/providers-onescreen-ai-sdk (an EdgeTag connector published by Blotout, not by
+    OneScreen — homepage github.com/blotoutio/edgetag-sdk). Not first-party; not recorded.
+- registry: pypi
+  queries:
+  - onescreen
+  - onescreen-ai
+  - onescreen-mcp
+  result: 404 on every name
+- registry: github
+  detail: >-
+    github.com/onescreenai is the company's organization (name "OneScreen.ai", blog
+    https://onescreen.ai) and has 0 public repositories. github.com/onescreen is an unrelated
+    org (Adaptive Medias, Inc — last activity 2015) and must not be attributed to OneScreen.
+  result: no first-party code published
+- registry: rubygems, crates.io, nuget, maven-central, pkg.go.dev
+  result: no candidate names surfaced from the provider's own docs to look up
+distribution:
+  model: remote-only
+  detail: >-
+    The single distribution channel is https://mcp.onescreen.ai/mcp. There is no npx/pip
+    stdio package and no CDN-hosted component either, so there is no version or publish date
+    a consumer could pin or age-check.
+sources:
+- https://registry.npmjs.org/-/v1/search?text=onescreen
+- https://api.github.com/orgs/onescreenai

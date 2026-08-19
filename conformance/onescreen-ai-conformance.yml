@@ -1,0 +1,138 @@
+generated: '2026-08-13'
+method: probed
+source: live probes of mcp.onescreen.ai, auth.onescreen.ai, api.onescreen.ai, www.onescreen.ai
+note: >-
+  Every `conforms: true` below is backed by a document we fetched anonymously and parsed.
+  OneScreen publishes no compliance/certification claims (no trust center, no SOC 2 / ISO
+  27001 / PCI page was found), so no Compliance pointer is emitted.
+standards:
+- id: mcp
+  name: Model Context Protocol
+  conforms: true
+  evidence:
+    url: https://mcp.onescreen.ai/mcp
+    detail: >-
+      POST of a JSON-RPC 2.0 tools/list returned 401 with an RFC 9728 Bearer challenge; GET
+      returned 405 Method Not Allowed. The path behaves as a Streamable HTTP MCP endpoint.
+      Protocol version could not be read — initialize is also auth-gated.
+  limitation: tools/list is auth-gated, so no tool manifest could be captured.
+- id: oauth2
+  name: OAuth 2.1 (authorization code + refresh, PKCE required)
+  conforms: true
+  evidence:
+    url: https://mcp.onescreen.ai/.well-known/oauth-authorization-server
+    detail: >-
+      grant_types_supported [authorization_code, refresh_token]; response_types_supported
+      [code]; code_challenge_methods_supported [S256]. Endpoints namespaced under
+      https://auth.onescreen.ai/oauth/2.1/.
+- id: rfc8414
+  name: OAuth 2.0 Authorization Server Metadata
+  conforms: true
+  evidence:
+    url: https://mcp.onescreen.ai/.well-known/oauth-authorization-server
+    http_status: 200
+    detail: Served anonymously with issuer, authorization/token/registration/introspection endpoints.
+- id: rfc9728
+  name: OAuth 2.0 Protected Resource Metadata
+  conforms: true
+  evidence:
+    url: https://mcp.onescreen.ai/.well-known/oauth-protected-resource/mcp
+    http_status: 200
+    detail: >-
+      Advertised by name in the WWW-Authenticate header on the 401, and returns resource,
+      authorization_servers[], scopes_supported[] and bearer_methods_supported[].
+- id: rfc7591
+  name: OAuth 2.0 Dynamic Client Registration
+  conforms: true
+  evidence:
+    url: https://auth.onescreen.ai/oauth/2.1/register
+    detail: Advertised as registration_endpoint in the authorization-server metadata.
+- id: rfc7636
+  name: PKCE
+  conforms: true
+  evidence:
+    url: https://mcp.onescreen.ai/.well-known/oauth-authorization-server
+    detail: code_challenge_methods_supported = ["S256"]; plain is not offered.
+- id: rfc7662
+  name: OAuth 2.0 Token Introspection
+  conforms: true
+  evidence:
+    url: https://auth.onescreen.ai/oauth/2.1/introspect
+    detail: Advertised as introspection_endpoint in the authorization-server metadata.
+- id: oidc
+  name: OpenID Connect Discovery 1.0
+  conforms: true
+  evidence:
+    url: https://auth.onescreen.ai/.well-known/openid-configuration
+    http_status: 200
+    detail: >-
+      Full discovery document with jwks_uri, userinfo_endpoint, RS256 id_token signing.
+      Applies to the product login (PropelAuth), not to the MCP surface.
+- id: rfc8615
+  name: Well-Known URIs
+  conforms: true
+  evidence:
+    detail: >-
+      Four documents served under /.well-known/ across mcp.onescreen.ai and
+      auth.onescreen.ai. See well-known/onescreen-ai-well-known.yml.
+- id: jsonrpc2
+  name: JSON-RPC 2.0
+  conforms: true
+  evidence:
+    detail: The MCP transport is JSON-RPC 2.0 by protocol definition; envelope not observable while gated.
+- id: aipref-content-signals
+  name: Cloudflare Content Signals Policy (robots.txt)
+  conforms: true
+  evidence:
+    url: https://www.onescreen.ai/robots.txt
+    http_status: 200
+    detail: >-
+      'Content-Signal: search=yes, ai-train=no, use=reference' plus explicit Disallow for
+      GPTBot, ClaudeBot, CCBot, Google-Extended, Applebot-Extended, Bytespider,
+      meta-externalagent and Amazonbot. Note the tension worth recording: OneScreen blocks
+      general AI crawlers on the marketing site while shipping a purpose-built MCP server —
+      a deliberate "come through the front door" posture, not an anti-agent one.
+- id: openapi
+  name: OpenAPI
+  conforms: false
+  evidence:
+    detail: >-
+      No OpenAPI/Swagger anywhere. api.onescreen.ai is a live NestJS service (/health returns
+      {"status":"ok"}), and /openapi.json, /docs, /redoc and /docs-json all return a bare
+      403 from awselb/2.0 — the routes exist but the load balancer refuses them publicly.
+      /swagger.json, /api-json, /api-docs, /v1/openapi.json return the NestJS 404 JSON.
+- id: graphql
+  name: GraphQL
+  conforms: false
+  evidence:
+    url: https://api.onescreen.ai/graphql
+    http_status: 404
+- id: asyncapi
+  name: AsyncAPI
+  conforms: false
+  evidence:
+    detail: No event, streaming or webhook surface is published.
+- id: rfc9457
+  name: Problem Details for HTTP APIs
+  conforms: false
+  evidence:
+    detail: >-
+      Observable error bodies are NestJS defaults ({"message","error","statusCode"}) and bare
+      text/plain from the ALB; neither is application/problem+json.
+- id: rfc9116
+  name: security.txt
+  conforms: false
+  evidence:
+    url: https://www.onescreen.ai/.well-known/security.txt
+    http_status: 404
+- id: a2a
+  name: A2A Agent Card
+  conforms: false
+  evidence:
+    detail: >-
+      /.well-known/agent-card.json and /.well-known/agent.json return 404 on all four hosts.
+sources:
+- https://mcp.onescreen.ai/.well-known/oauth-authorization-server
+- https://mcp.onescreen.ai/.well-known/oauth-protected-resource/mcp
+- https://auth.onescreen.ai/.well-known/openid-configuration
+- https://www.onescreen.ai/robots.txt

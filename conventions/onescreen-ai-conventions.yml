@@ -1,0 +1,66 @@
+generated: '2026-08-13'
+method: probed
+source: live probes of mcp.onescreen.ai + api.onescreen.ai; https://www.onescreen.ai/mcp/
+note: >-
+  OneScreen's only public surface is an MCP server, so most REST conventions (pagination
+  style, field expansion, idempotency keys, request-id echo) are not applicable at the
+  protocol boundary and are not documented at the tool boundary either. Recorded as "not
+  published" rather than guessed. Nothing here is inferred from an OpenAPI — there isn't one.
+protocol:
+  primary: Model Context Protocol over Streamable HTTP
+  endpoint: https://mcp.onescreen.ai/mcp
+  envelope: JSON-RPC 2.0
+  methods: POST only (GET returns 405)
+  content_negotiation: 'Accept: application/json, text/event-stream'
+authentication:
+  style: OAuth 2.1 bearer token in the Authorization header
+  discovery: RFC 9728 protected-resource metadata advertised in the 401 WWW-Authenticate header
+  audience_restricted: true
+  api_keys: false
+  ref: authentication/onescreen-ai-authentication.yml
+authorization:
+  style: coarse resource scopes with a read/write split, plus field-level carve-outs
+  detail: >-
+    Commercially sensitive fields get their own scope rather than being folded into the
+    parent resource — inventories.pricing, inventories.owner_vendor, vendors.contacts,
+    personas.source. An agent granted mcp::inventories:read can find a billboard but cannot
+    see what it costs or who owns it.
+  ref: scopes/onescreen-ai-scopes.yml
+idempotency:
+  supported: unknown
+  documented: false
+  note: >-
+    No idempotency key, header or retry semantics are published for the write-capable tools
+    (plans:write, rfps:write, messages:send, audiences:write, customers:write). This is the
+    single largest documentation gap on the surface: mcp::messages:send is an
+    externally-visible side effect an agent can trigger, and nothing states whether a retry
+    duplicates it.
+pagination:
+  style: not published
+  note: The inventory corpus is described as ~1M listings, so paging almost certainly exists at the tool level; it is not documented publicly.
+versioning:
+  api_version: not published
+  scheme: not published
+  note: >-
+    The MCP protocol version is negotiated in initialize, which is auth-gated. The OAuth
+    surface is explicitly versioned in its path (/oauth/2.1/), and the scope vocabulary
+    carries two visible generations (see scopes/) — evidence of in-place evolution without a
+    published deprecation policy.
+errors:
+  mcp: JSON-RPC 2.0 error objects (not observable while gated)
+  rest_edge: '{"message": "...", "error": "...", "statusCode": n} — NestJS default on api.onescreen.ai'
+  problem_json: false
+  ref: null
+rate_limits:
+  signaling: none observed
+  ref: rate-limits/onescreen-ai-rate-limits.yml
+tracing:
+  request_id_header: none observed
+observability:
+  audit_logs: >-
+    Provider states audit logs are written on every call, and that per-tenant isolation
+    applies. Not exposed to the consumer through any published API.
+sources:
+- https://mcp.onescreen.ai/mcp
+- https://mcp.onescreen.ai/.well-known/oauth-protected-resource/mcp
+- https://www.onescreen.ai/mcp/

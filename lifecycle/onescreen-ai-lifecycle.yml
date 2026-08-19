@@ -1,0 +1,66 @@
+generated: '2026-08-13'
+method: probed
+source: live probes of onescreen.ai hosts
+note: >-
+  Recorded as an honest absence. OneScreen publishes no versioning policy, no deprecation
+  policy, no Sunset/Deprecation header contract, no SLA and no working status page. No
+  StatusPage or Deprecation pointer is emitted in apis.yml, because there is nothing on the
+  provider's surface for either pointer to assert.
+versioning:
+  policy_published: false
+  api_version: null
+  scheme: null
+  observed:
+  - surface: OAuth
+    detail: >-
+      Endpoints are versioned in the path — https://auth.onescreen.ai/oauth/2.1/authorize —
+      which names the OAuth profile rather than a OneScreen API version.
+  - surface: MCP scopes
+    detail: >-
+      The authorization-server metadata carries two generations of scope naming
+      simultaneously (mcp::read:pricing alongside mcp::inventories.pricing:read). The older
+      four are already dropped from the protected-resource metadata. That is a live rename in
+      flight with no published deprecation notice attached to it — the clearest lifecycle
+      finding on this provider.
+deprecation:
+  policy_published: false
+  sunset_header: not observed
+  deprecation_header: not observed
+  deprecated_operations: []
+status_page:
+  published: false
+  probes:
+  - url: https://status.onescreen.ai/
+    http_status: 200
+    finding: >-
+      The hostname resolves (Cloudflare) and serves a Freshping public status page shell whose
+      body reads "Status page for domain name does not exist". A DNS record was created and
+      the status page behind it never was. This is a soft-200: a 200 that carries no status
+      document, and it must not be credited as a status page.
+  - url: https://onescreen.statuspage.io
+    http_status: 200
+    finding: Redirects to Atlassian's Statuspage marketing site — not a OneScreen page.
+  - url: https://onescreenai.statuspage.io
+    http_status: 200
+    finding: Same Atlassian marketing redirect. Not a OneScreen page.
+  - url: https://status.onescreen.ai/api/v2/status.json
+    http_status: 403
+    finding: No Statuspage v2 API behind the host.
+sla:
+  published: false
+support:
+  channel: https://www.onescreen.ai/contact/
+  email: published on the site as an obfuscated address
+maturity:
+  stage: public beta
+  detail: >-
+    The provider labels the MCP server a free public beta with batched access approval, and
+    OneScreen Planner an invitation-only closed beta.
+  source: https://www.onescreen.ai/mcp/
+changelog:
+  published: false
+  note: No dated changelog or release-notes page was found for the MCP server.
+sources:
+- https://www.onescreen.ai/mcp/
+- https://mcp.onescreen.ai/.well-known/oauth-authorization-server
+- https://status.onescreen.ai/

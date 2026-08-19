@@ -1,0 +1,103 @@
+generated: '2026-08-13'
+method: probed
+source: https://mcp.onescreen.ai/.well-known/oauth-authorization-server
+docs: https://www.onescreen.ai/mcp/
+note: >-
+  Not derived from an OpenAPI — OneScreen publishes no REST contract. These scopes are read
+  verbatim from the two anonymous OAuth discovery documents the MCP host serves: the RFC 8414
+  authorization-server metadata (22 scopes) and the RFC 9728 protected-resource metadata for
+  https://mcp.onescreen.ai/mcp (18 scopes). Descriptions are ours, inferred from the scope
+  name and the provider's published product description; the scope STRINGS are the provider's.
+authorization_server: https://auth.onescreen.ai/oauth/2.1
+resource: https://mcp.onescreen.ai/mcp
+scope_count: 22
+resource_scope_count: 18
+naming:
+  pattern: 'mcp::<resource>[.<sub-resource>]:<action>'
+  actions:
+  - read
+  - write
+  - send
+  - connect
+  note: >-
+    Two generations of naming coexist in the authorization-server metadata. The current form
+    puts the action last (mcp::inventories.pricing:read); four legacy scopes put it first
+    (mcp::read:pricing). The legacy four are absent from the protected-resource metadata,
+    which is the narrower and more current of the two documents.
+scopes:
+- scope: mcp::server:connect
+  description: Establish an MCP session with the server. The baseline scope; everything else gates data.
+  in_resource_metadata: true
+- scope: mcp::audiences:read
+  description: Read behavioral OOH audience personas and audience segments.
+  in_resource_metadata: true
+- scope: mcp::audiences:write
+  description: Create or update audience segments.
+  in_resource_metadata: true
+- scope: mcp::personas.source:read
+  description: Read the underlying source/provenance detail behind a persona.
+  in_resource_metadata: true
+- scope: mcp::markets:read
+  description: Read audience-based market rankings and market recommendations.
+  in_resource_metadata: true
+- scope: mcp::inventories:read
+  description: Search and read OOH inventory listings (placements/units).
+  in_resource_metadata: true
+- scope: mcp::inventories.pricing:read
+  description: >-
+    Read pricing and availability for inventory. Separately scoped from inventories:read —
+    this is the permission-based pricing intelligence the provider reserves for the Planner
+    closed beta.
+  in_resource_metadata: true
+- scope: mcp::inventories.owner_vendor:read
+  description: Read the media owner / vendor that owns a given inventory unit.
+  in_resource_metadata: true
+- scope: mcp::pois:read
+  description: Read points of interest used for geospatial and audience-density overlays.
+  in_resource_metadata: true
+- scope: mcp::vendors:read
+  description: Read media owner / vendor records.
+  in_resource_metadata: true
+- scope: mcp::vendors.contacts:read
+  description: Read vendor contact records (reps). Separately scoped — contact data is PII.
+  in_resource_metadata: true
+- scope: mcp::plans:read
+  description: Read media plans / campaigns.
+  in_resource_metadata: true
+- scope: mcp::plans:write
+  description: Create or modify a media plan / campaign.
+  in_resource_metadata: true
+- scope: mcp::rfps:read
+  description: Read requests for proposal.
+  in_resource_metadata: true
+- scope: mcp::rfps:write
+  description: Draft or update a request for proposal against shortlisted inventory.
+  in_resource_metadata: true
+- scope: mcp::messages:send
+  description: Send a message into the marketplace workflow (e.g. RFP or quote outreach to a vendor).
+  in_resource_metadata: true
+- scope: mcp::customers:read
+  description: Read customer / tenant records.
+  in_resource_metadata: true
+- scope: mcp::customers:write
+  description: Create or update customer / tenant records.
+  in_resource_metadata: true
+- scope: mcp::read:pricing
+  description: Legacy form of mcp::inventories.pricing:read.
+  in_resource_metadata: false
+  status: legacy
+- scope: mcp::read:owner_vendors
+  description: Legacy form of mcp::inventories.owner_vendor:read.
+  in_resource_metadata: false
+  status: legacy
+- scope: mcp::read:vendor_contacts
+  description: Legacy form of mcp::vendors.contacts:read.
+  in_resource_metadata: false
+  status: legacy
+- scope: mcp::read:persona_source
+  description: Legacy form of mcp::personas.source:read.
+  in_resource_metadata: false
+  status: legacy
+sources:
+- https://mcp.onescreen.ai/.well-known/oauth-authorization-server
+- https://mcp.onescreen.ai/.well-known/oauth-protected-resource/mcp

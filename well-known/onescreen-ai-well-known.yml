@@ -1,0 +1,97 @@
+generated: '2026-08-13'
+method: probed
+source: live HTTP probes of every OneScreen host (www, api, mcp, auth)
+note: >-
+  The marketing host (www.onescreen.ai) serves nothing at /.well-known/ — every path
+  returns a real nginx 404. The agent surface does: the MCP host publishes RFC 8414
+  authorization-server metadata and RFC 9728 protected-resource metadata anonymously,
+  and the auth host publishes an OpenID Connect discovery document plus a JWKS. Those
+  three documents are the only machine-readable contract OneScreen publishes without
+  credentials, and they are saved verbatim alongside this index.
+hosts:
+- host: mcp.onescreen.ai
+  paths:
+  - path: /.well-known/oauth-authorization-server
+    status: 200
+    content_type: application/json
+    file: onescreen-ai-oauth-authorization-server.json
+    note: 'RFC 8414. Issuer https://auth.onescreen.ai — 22 mcp:: scopes advertised.'
+  - path: /.well-known/oauth-protected-resource/mcp
+    status: 200
+    content_type: application/json
+    file: onescreen-ai-oauth-protected-resource.json
+    note: >-
+      RFC 9728. Named in the WWW-Authenticate challenge returned by the 401 on
+      "https://mcp.onescreen.ai/mcp". Declares resource + 18 scopes.
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/oauth-authorization-server/mcp
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+  - path: /.well-known/mcp.json
+    status: 404
+- host: auth.onescreen.ai
+  paths:
+  - path: /.well-known/openid-configuration
+    status: 200
+    content_type: application/json
+    file: onescreen-ai-openid-configuration.json
+    note: >-
+      PropelAuth-hosted OIDC discovery for the end-user login (separate from the
+      OAuth 2.1 endpoints the MCP server delegates to under /oauth/2.1/).
+  - path: /.well-known/jwks.json
+    status: 200
+    file: null
+    note: >-
+      RSA/RS256 signing keys. Not saved as a raw file — key material rotates and a
+      snapshot would go stale; recorded as present.
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+- host: api.onescreen.ai
+  paths:
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+- host: www.onescreen.ai
+  paths:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+summary:
+  hosts_probed: 4
+  paths_probed: 32
+  documents_served: 4
+  security_txt: false
+  api_catalog: false
+  agent_card: false

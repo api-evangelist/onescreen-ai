@@ -1,0 +1,54 @@
+generated: '2026-08-13'
+method: searched
+source: https://www.onescreen.ai/mcp/
+note: >-
+  OneScreen publishes no pricing page — https://www.onescreen.ai/pricing/ returns 404. The
+  only published commercial terms for the agent surface are in the FAQ on the MCP page, and
+  they are recorded verbatim below. Media buying itself is quoted per campaign through the
+  RFP workflow, not listed.
+pricing_page: null
+pricing_page_status: 404
+plan_count: 2
+currency: USD
+plans:
+- name: OneScreen Research
+  price: 0
+  price_display: Free
+  billing_period: null
+  access: public beta — request access, approved in batches
+  includes:
+  - 1,500+ behavioral OOH audience personas
+  - close to one million live OOH inventory listings
+  - audience-based market rankings and recommendations
+  - audience-based inventory rankings and recommendations
+  quota: not published
+  overage: not published
+  limits: not published
+  quote: >-
+    "Access to research tools via the public MCP server is free. No paywall, no commitments."
+  source: https://www.onescreen.ai/mcp/
+- name: OneScreen Planner
+  price: null
+  price_display: not published
+  billing_period: null
+  access: closed beta — invitation-only design-partner program
+  includes:
+  - higher rate limits
+  - permission-based pricing intelligence (scope mcp::inventories.pricing:read)
+  - planning and buying workflow integration (plans, RFPs, messages)
+  quota: not published
+  overage: not published
+  limits: 'higher rate limits than Research; specific numbers not published'
+  quote: >-
+    "Onescreen Planner: an invite-only design-partner program for brand marketers, agencies,
+    and supply-side teams involved in OOH planning workflows."
+  source: https://www.onescreen.ai/mcp/
+observations:
+- >-
+  The free/paid boundary is legible in the OAuth scopes even though the prices are not:
+  mcp::inventories:read is research, while mcp::inventories.pricing:read,
+  mcp::inventories.owner_vendor:read and mcp::vendors.contacts:read are the commercially
+  sensitive fields carved into their own scopes.
+sources:
+- https://www.onescreen.ai/mcp/
+- https://mcp.onescreen.ai/.well-known/oauth-protected-resource/mcp

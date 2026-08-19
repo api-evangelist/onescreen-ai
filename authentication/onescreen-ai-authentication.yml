@@ -1,0 +1,97 @@
+generated: '2026-08-13'
+method: probed
+source: https://mcp.onescreen.ai/.well-known/oauth-authorization-server
+docs: https://www.onescreen.ai/mcp/
+note: >-
+  Derived from live OAuth/OIDC discovery documents, not from an OpenAPI securitySchemes block
+  — OneScreen publishes no REST contract. Two distinct authorization surfaces exist on the
+  same issuer host and should not be conflated: the OAuth 2.1 endpoints under
+  /oauth/2.1/ that the MCP server delegates to, and a PropelAuth-hosted OpenID Connect
+  surface under /propelauth/oauth/ used for end-user login to the OneScreen app.
+summary:
+  scheme_count: 1
+  primary: oauth2
+  api_keys: false
+  mtls: false
+  anonymous_access: false
+schemes:
+- id: mcp_oauth21
+  type: oauth2
+  profile: OAuth 2.1
+  applies_to: https://mcp.onescreen.ai/mcp
+  flows:
+    authorization_code:
+      authorization_url: https://auth.onescreen.ai/oauth/2.1/authorize
+      token_url: https://auth.onescreen.ai/oauth/2.1/token
+      refresh_supported: true
+      pkce_required_methods:
+      - S256
+      scopes_ref: scopes/onescreen-ai-scopes.yml
+  issuer: https://auth.onescreen.ai
+  registration_endpoint: https://auth.onescreen.ai/oauth/2.1/register
+  introspection_endpoint: https://auth.onescreen.ai/oauth/2.1/introspect
+  dynamic_client_registration: true
+  token_endpoint_auth_methods:
+  - client_secret_basic
+  - client_secret_post
+  - none
+  bearer_methods_supported:
+  - header
+  audience_restricted: true
+  resource_indicator: https://mcp.onescreen.ai/mcp
+  discovery:
+  - url: https://mcp.onescreen.ai/.well-known/oauth-protected-resource/mcp
+    spec: RFC 9728
+    status: 200
+  - url: https://mcp.onescreen.ai/.well-known/oauth-authorization-server
+    spec: RFC 8414
+    status: 200
+  challenge:
+    status: 401
+    header: 'WWW-Authenticate: Bearer resource_metadata="https://mcp.onescreen.ai/.well-known/oauth-protected-resource/mcp"'
+    note: >-
+      A conformant RFC 9728 challenge — an MCP client that has never seen OneScreen can
+      discover the authorization server, register itself dynamically, and complete the flow
+      with no out-of-band configuration. This is the strongest part of OneScreen's posture.
+- id: propelauth_oidc
+  type: openIdConnect
+  applies_to: OneScreen web application login
+  openid_configuration: https://auth.onescreen.ai/.well-known/openid-configuration
+  issuer: https://auth.onescreen.ai
+  authorization_url: https://auth.onescreen.ai/propelauth/oauth/authorize
+  token_url: https://auth.onescreen.ai/propelauth/oauth/token
+  userinfo_url: https://auth.onescreen.ai/propelauth/oauth/userinfo
+  jwks_uri: https://auth.onescreen.ai/.well-known/jwks.json
+  id_token_signing_alg_values_supported:
+  - RS256
+  scopes:
+  - openid
+  - email
+  - profile
+  claims_supported:
+  - email
+  - email_verified
+  - exp
+  - first_name
+  - last_name
+  - iat
+  - iss
+  - picture_url
+  pkce_required_methods:
+  - S256
+  vendor: PropelAuth
+  note: >-
+    Identity-layer login for the product, not the agent surface. Advertises no refresh_token
+    grant, unlike the MCP OAuth 2.1 surface.
+access:
+  model: request-access
+  form: https://www.onescreen.ai/mcp/
+  note: >-
+    Dynamic client registration is open, but a OneScreen account must first be approved
+    through the beta waitlist; the provider states verified work domains are usually cleared
+    the same business day.
+sources:
+- https://mcp.onescreen.ai/.well-known/oauth-authorization-server
+- https://mcp.onescreen.ai/.well-known/oauth-protected-resource/mcp
+- https://auth.onescreen.ai/.well-known/openid-configuration
+- https://www.onescreen.ai/mcp/

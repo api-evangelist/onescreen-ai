@@ -1,51 +1,152 @@
-generated: '2026-07-20'
-method: searched
-source: https://www.onescreen.ai/mcp/
+generated: '2026-08-13'
+method: probed
+source: https://mcp.onescreen.ai/mcp
 status: published
 status_raw: published
 server:
   name: OneScreen MCP Server
-  summary: >-
-    Connects OneScreen's out-of-home (OOH) advertising research data — audience
-    personas, market and inventory rankings, and close to one million live
-    inventory listings — to AI clients such as Claude and ChatGPT, or any client
-    that supports the Model Context Protocol.
-  transport: http           # remote/hosted MCP server (HTTP)
-  url: null                 # endpoint provisioned per tenant after beta approval; not publicly published
+  summary: Connects OneScreen's out-of-home (OOH) advertising research data — audience personas, market
+    and inventory rankings, and close to one million live inventory listings — to AI clients such as Claude
+    and ChatGPT, or any client that supports the Model Context Protocol.
+  transport: http
+  url: https://mcp.onescreen.ai/mcp
   access_url: https://www.onescreen.ai/mcp/
-  access: request-access    # approved in batches during public beta; most signups same business day
-  pricing: free             # public MCP research tools are free (OneScreen Research tier)
+  access: request-access
+  pricing: free
+  origin_server: uvicorn
+deployment:
+  mode: remote
+  endpoint: https://mcp.onescreen.ai/mcp
+  auth: oauth
+  verified: probed
+  checked: '2026-08-13'
+  install: null
+  package: null
+  note: >-
+    Remote only. No npx/pip package, no stdio distribution, and no first-party client
+    library exists on any public registry — the sole way to reach OneScreen is to point
+    an MCP client at this HTTPS endpoint and complete the OAuth 2.1 flow.
+  evidence:
+  - url: https://mcp.onescreen.ai/mcp
+    method: POST
+    body: '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
+    http_status: 401
+    www_authenticate: Bearer resource_metadata="https://mcp.onescreen.ai/.well-known/oauth-protected-resource/mcp"
+  - url: https://mcp.onescreen.ai/mcp
+    method: GET
+    http_status: 405
+    note: Method Not Allowed — the path exists and is POST-only, as Streamable HTTP expects.
+  correction: >-
+    A prior enrichment round recorded deployment.endpoint as https://www.onescreen.ai/mcp/
+    with probe "not-mcp". That URL is the marketing/request-access page, not the server.
+    The real endpoint is https://mcp.onescreen.ai/mcp, established here by a live JSON-RPC
+    POST that returned an RFC 9728 OAuth challenge.
 auth:
-  scheme: oauth2            # OAuth 2.1
+  scheme: oauth2
+  profile: OAuth 2.1
+  issuer: https://auth.onescreen.ai
+  authorization_server: https://auth.onescreen.ai/oauth/2.1
+  bearer_methods_supported:
+  - header
+  dynamic_client_registration: true
+  pkce: S256
+  discovery:
+  - https://mcp.onescreen.ai/.well-known/oauth-protected-resource/mcp
+  - https://mcp.onescreen.ai/.well-known/oauth-authorization-server
+  scopes: scopes/onescreen-ai-scopes.yml
   notes: >-
-    OAuth 2.1 with audience-restricted tokens, per-tenant isolation, and audit
-    logs on every call. Per the provider, OneScreen cannot access the user's
-    data, chat conversations, or files.
+    OAuth 2.1 with audience-restricted tokens, per-tenant isolation, and audit logs on
+    every call. Per the provider, OneScreen cannot access the user's data, chat
+    conversations, or files. Dynamic client registration is open at
+    https://auth.onescreen.ai/oauth/2.1/register, so an MCP client can onboard itself.
 clients:
-  - Claude
-  - ChatGPT
-  - any MCP-compatible client or harness
-# Capability families the server exposes, per the provider's public MCP page and
-# press coverage. These are described capabilities, NOT verbatim tool/operationId
-# names (the tool manifest and endpoint are gated behind beta access), so no exact
-# tool schema is asserted here.
+- Claude
+- ChatGPT
+- Copilot
+- Slack
+- Notion
+- any MCP-compatible client or harness
+tools:
+  count_published: 15
+  introspection: gated
+  introspection_note: >-
+    tools/list returns 401 without a bearer token, so the real tool names and inputSchemas
+    could not be captured. The provider's own MCP page states "15 AVAILABLE TOOLS". The
+    capability inventory below is NOT a tool list — it is derived from the OAuth scopes the
+    server advertises anonymously, which is the only authoritative, provider-published
+    statement of what the server can reach.
+  list: []
 capabilities:
-  - name: audience-personas
-    description: Query 1,500+ OOH audience personas.
-  - name: market-rankings
-    description: Audience-based market ranking and recommendations.
-  - name: inventory-rankings
-    description: Audience-based inventory ranking and recommendations.
-  - name: inventory-search
-    description: Search close to one million live OOH inventory listings (e.g. billboard inventory for a demographic in a given city).
+- name: audiences
+  scopes:
+  - mcp::audiences:read
+  - mcp::audiences:write
+  description: Behavioral OOH audience personas (1,500+) — search, and build/persist audience segments.
+- name: personas.source
+  scopes:
+  - mcp::personas.source:read
+  description: Provenance/source detail behind a persona.
+- name: markets
+  scopes:
+  - mcp::markets:read
+  description: Audience-based market ranking and recommendation.
+- name: inventories
+  scopes:
+  - mcp::inventories:read
+  - mcp::inventories.pricing:read
+  - mcp::inventories.owner_vendor:read
+  description: >-
+    Search and rank close to one million live OOH placements; pricing/avails and the owning
+    vendor are separately scoped, which is how the free research tier is fenced off from the
+    permission-based pricing intelligence in Planner.
+- name: pois
+  scopes:
+  - mcp::pois:read
+  description: Points of interest for geospatial/audience overlays.
+- name: vendors
+  scopes:
+  - mcp::vendors:read
+  - mcp::vendors.contacts:read
+  description: Media owners and their reps; contacts separately scoped.
+- name: plans
+  scopes:
+  - mcp::plans:read
+  - mcp::plans:write
+  description: Media plans / campaigns — read existing plans and build new ones.
+- name: rfps
+  scopes:
+  - mcp::rfps:read
+  - mcp::rfps:write
+  description: Requests for proposal — draft and read RFPs against shortlisted inventory.
+- name: messages
+  scopes:
+  - mcp::messages:send
+  description: Send messages (RFP/quote outreach) into the marketplace workflow.
+- name: customers
+  scopes:
+  - mcp::customers:read
+  - mcp::customers:write
+  description: Tenant/customer records.
 tiers:
-  - name: OneScreen Research
-    access: public beta (free)
-    scope: audience personas, inventory listings, market/inventory recommendations
-  - name: OneScreen Planner
-    access: closed beta (invitation-only design partners)
-    scope: higher rate limits; permission-based pricing intelligence; planning/buying workflow integration
+- name: OneScreen Research
+  access: public beta (free)
+  scope: audience personas, inventory listings, market/inventory recommendations
+  price: >-
+    Free. Provider FAQ: "Access to research tools via the public MCP server is free. No
+    paywall, no commitments."
+- name: OneScreen Planner
+  access: closed beta (invitation-only design partners)
+  scope: higher rate limits; permission-based pricing intelligence; planning/buying workflow integration
+onboarding:
+  model: request-access
+  form: https://www.onescreen.ai/mcp/
+  approval: >-
+    Batched during the beta; per the provider FAQ, verified work domains are usually
+    cleared the same business day.
 sources:
-  - https://www.onescreen.ai/mcp/
-  - https://martechseries.com/sales-marketing/programmatic-buying/onescreen-modernizes-out-of-home-advertising-previews-real-world-ooh-intelligence-inside-enterprise-ai-workflows/
-  - https://billboardinsider.com/onescreen-embeds-one-million-live-listings-into-chatgpt-and-claude/
+- https://mcp.onescreen.ai/mcp
+- https://mcp.onescreen.ai/.well-known/oauth-protected-resource/mcp
+- https://mcp.onescreen.ai/.well-known/oauth-authorization-server
+- https://www.onescreen.ai/mcp/
+- https://martechseries.com/sales-marketing/programmatic-buying/onescreen-modernizes-out-of-home-advertising-previews-real-world-ooh-intelligence-inside-enterprise-ai-workflows/
+- https://billboardinsider.com/onescreen-embeds-one-million-live-listings-into-chatgpt-and-claude/

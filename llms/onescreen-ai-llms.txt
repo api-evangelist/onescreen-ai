@@ -1,25 +1,51 @@
 # OneScreen AI
 
-> OneScreen is a data-driven out-of-home (OOH) advertising company that makes real-world advertising — billboards, transit, and place-based media — as queryable and buyable as any digital channel. It combines 1,500+ OOH audience personas, close to one million live inventory listings, and audience-based market/inventory recommendation models, and exposes that intelligence to AI agents through a public Model Context Protocol (MCP) server. OneScreen has no traditional public REST API; its agent-facing surface is the MCP server.
+> OneScreen is a data-driven out-of-home (OOH) advertising company that makes real-world advertising — billboards, transit, and place-based media — as queryable and buyable as any digital channel. It combines 1,500+ behavioral OOH audience personas, close to one million live inventory listings, and audience-based market/inventory recommendation models, and exposes that intelligence to AI agents through a public Model Context Protocol (MCP) server. OneScreen publishes no REST or GraphQL contract; the MCP server is the API.
 
 ## Agent surface
-- [OneScreen MCP Server](https://www.onescreen.ai/mcp/): Remote MCP server (HTTP, OAuth 2.1) connecting OneScreen OOH research data to Claude, ChatGPT, or any MCP client. Free public beta (access by request). See mcp/onescreen-ai-mcp.yml in this repo.
+- [OneScreen MCP Server](https://mcp.onescreen.ai/mcp): Remote MCP endpoint (Streamable HTTP, POST only). Returns 401 with an RFC 9728 `WWW-Authenticate: Bearer resource_metadata=...` challenge until an OAuth 2.1 token is presented. 15 tools per the provider; the tool manifest is auth-gated. Free public beta, access by request. See mcp/onescreen-ai-mcp.yml.
+- [Protected resource metadata](https://mcp.onescreen.ai/.well-known/oauth-protected-resource/mcp): RFC 9728. Declares the resource and 18 `mcp::` scopes.
+- [Authorization server metadata](https://mcp.onescreen.ai/.well-known/oauth-authorization-server): RFC 8414. Issuer `https://auth.onescreen.ai`, OAuth 2.1 authorization code + refresh, PKCE S256, open dynamic client registration, 22 scopes.
+- [OpenID Connect discovery](https://auth.onescreen.ai/.well-known/openid-configuration): PropelAuth-hosted login for the OneScreen product (not the agent surface).
 
-## Products
-- OneScreen Research (free): audience personas, inventory listings, and market/inventory recommendations.
-- OneScreen Planner (closed beta, invitation-only): higher rate limits, permission-based pricing intelligence, and planning/buying workflow integration.
+## How an agent connects
+1. POST JSON-RPC to `https://mcp.onescreen.ai/mcp` with `Accept: application/json, text/event-stream`.
+2. On the 401, read `resource_metadata` from the `WWW-Authenticate` header.
+3. Register dynamically at `https://auth.onescreen.ai/oauth/2.1/register`, then run authorization code + PKCE (S256) against `https://auth.onescreen.ai/oauth/2.1/authorize` and `/token`.
+4. Send the token as `Authorization: Bearer <token>` (header is the only supported bearer method).
+5. A OneScreen beta account is required first — request access at https://www.onescreen.ai/mcp/.
+
+## Capabilities (from the published OAuth scopes)
+- Audiences — 1,500+ behavioral OOH personas; read and build segments (`mcp::audiences:read`, `mcp::audiences:write`, `mcp::personas.source:read`).
+- Markets — audience-based market ranking and recommendation (`mcp::markets:read`).
+- Inventory — search/rank ~1M live OOH placements (`mcp::inventories:read`); pricing and owning vendor are separately scoped (`mcp::inventories.pricing:read`, `mcp::inventories.owner_vendor:read`).
+- Geospatial — points of interest for audience-density overlays (`mcp::pois:read`).
+- Vendors — media owners and their reps (`mcp::vendors:read`, `mcp::vendors.contacts:read`).
+- Marketplace workflow — plans, RFPs and outreach (`mcp::plans:read/write`, `mcp::rfps:read/write`, `mcp::messages:send`).
+- Tenancy — customer records (`mcp::customers:read/write`).
+
+## Products and access
+- OneScreen Research — free public beta. "Access to research tools via the public MCP server is free. No paywall, no commitments."
+- OneScreen Planner — invitation-only closed beta: higher rate limits, permission-based pricing intelligence, planning/buying workflow integration.
+- Access is batched during the beta; verified work domains are usually cleared the same business day.
 
 ## Docs and site
-- [Solutions](https://www.onescreen.ai/solutions/): OOH solutions overview.
-- [About](https://www.onescreen.ai/about/): Company and OOH explainer.
-- [FAQ](https://www.onescreen.ai/faq/): Out-of-home advertising FAQ.
-- [B2B](https://www.onescreen.ai/b2b/): B2B out-of-home advertising.
-- [Blog](https://www.onescreen.ai/blog/): OOH strategy, measurement, and pricing articles.
+- [MCP server page](https://www.onescreen.ai/mcp/): the developer-facing page — connection pitch, FAQ, and the access request form.
+- [Solutions](https://www.onescreen.ai/solutions/), [About](https://www.onescreen.ai/about/), [FAQ](https://www.onescreen.ai/faq/), [B2B](https://www.onescreen.ai/b2b/), [Blog](https://www.onescreen.ai/blog/), [Contact](https://www.onescreen.ai/contact/).
 
 ## Repo artifacts
-- mcp/onescreen-ai-mcp.yml — MCP server profile (type MCPServer).
-- security/onescreen-ai-domain-security.yml — TLS/DNS email-auth posture (probed).
+- mcp/onescreen-ai-mcp.yml — MCP server profile, endpoint + deployment mode (probed).
+- scopes/onescreen-ai-scopes.yml — 22 OAuth scopes read from discovery.
+- authentication/onescreen-ai-authentication.yml — OAuth 2.1 + OIDC profile.
+- well-known/onescreen-ai-well-known.yml — /.well-known probe index across four hosts, plus the three raw documents.
+- conformance/onescreen-ai-conformance.yml — MCP, OAuth 2.1, RFC 8414/9728/7591/7636/7662, OIDC.
+- conventions/onescreen-ai-conventions.yml — protocol, authorization, and the documentation gaps.
+- plans/onescreen-ai-plans-pricing.yml, rate-limits/onescreen-ai-rate-limits.yml, lifecycle/onescreen-ai-lifecycle.yml, packages/onescreen-ai-packages.yml, security/onescreen-ai-domain-security.yml.
 
 ## Notes
-- No OpenAPI/Swagger/AsyncAPI/GraphQL specification is published; spec-derived artifacts (overlays, error catalogs, OAuth scopes, data model, agentic-access, agent skills) are not applicable.
-- This llms.txt was generated by the API Evangelist enrichment pipeline from the public catalog; it is not a verbatim provider-published /llms.txt (that path returned 404).
+- No OpenAPI, Swagger, AsyncAPI or GraphQL specification is published. `api.onescreen.ai` is a live NestJS service (`/health` returns 200) but `/openapi.json`, `/docs`, `/redoc` and `/docs-json` all return a bare 403 from the AWS load balancer.
+- No A2A agent card at either `/.well-known/agent-card.json` or `/.well-known/agent.json` on any host.
+- No security.txt, no bug bounty, no trust center, no status page (`status.onescreen.ai` returns a Freshping shell reading "Status page for domain name does not exist").
+- No first-party SDK, CLI or package on any public registry; the GitHub org `onescreenai` has 0 public repositories.
+- `https://www.onescreen.ai/robots.txt` carries a Cloudflare Content Signals policy: `search=yes, ai-train=no, use=reference`, and disallows GPTBot, ClaudeBot, CCBot, Google-Extended, Applebot-Extended, Bytespider, meta-externalagent and Amazonbot. Read the MCP server as the sanctioned front door for agents.
+- This llms.txt was generated by the API Evangelist enrichment pipeline from live probes and the public catalog; it is not a verbatim provider-published /llms.txt (that path returns 404).
