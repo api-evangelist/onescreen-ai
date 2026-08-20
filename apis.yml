@@ -47,6 +47,18 @@ tags:
 - Media
 - AI Agents
 - MCP
+- Authentication
+- Agent Readiness
+tags_raw:
+- Company
+- Advertising
+- Out-of-Home
+- DOOH
+- Advertising Technology
+- Marketing
+- Media
+- AI Agents
+- MCP
 - OAuth
 - Agent Readiness
 apis:
@@ -62,6 +74,13 @@ apis:
   humanURL: https://www.onescreen.ai/mcp/
   baseURL: https://mcp.onescreen.ai/mcp
   tags:
+  - MCP
+  - Out-of-Home
+  - Advertising
+  - Audience Data
+  - Inventory
+  - Authentication
+  tags_raw:
   - MCP
   - Out-of-Home
   - Advertising
