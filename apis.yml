@@ -102,6 +102,8 @@ apis:
   - type: MCPServer
     url: mcp/onescreen-ai-mcp.yml
 common:
+- type: Pricing
+  url: https://www.onescreen.ai/mcp/
 - url: https://www.onescreen.ai/feed/
   type: BlogRSS
 - type: Website
