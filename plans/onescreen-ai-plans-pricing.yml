@@ -52,3 +52,22 @@ observations:
 sources:
 - https://www.onescreen.ai/mcp/
 - https://mcp.onescreen.ai/.well-known/oauth-protected-resource/mcp
+x-canonical:
+  generated: '2026-10-08'
+  vocabulary: all/0-working/economics/plans-canonical.yml
+  models:
+  - metered
+  units: []
+  plans:
+  - name: OneScreen Research
+    access: other
+    model: metered
+    model_how: derived
+    units: []
+    periods: []
+  - name: OneScreen Planner
+    access: other
+    model: metered
+    model_how: derived
+    units: []
+    periods: []
